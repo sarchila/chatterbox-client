@@ -46,9 +46,23 @@ var getMessages = function(cb){
 };
 
 var roomNames = {'all':true};
+var displayedMsgID = [];
+var friends = {};
+
+var addRoom = function(room) {
+ var rn = room;
+ if (rn && !roomNames[rn] && rn.length < 30) {
+    roomNames[room] = true;
+    $room = $('<option></option>');
+    $room.text(room);
+    $room.val(room);
+    $('select').append($room);
+  }
+};
 
 var displayMessage = function (msgs) {
-  $('ul').html('');
+
+  // $('ul').html('');
 
   var makeRoom = function(message) {
     var rn = message.roomname;
@@ -63,9 +77,14 @@ var displayMessage = function (msgs) {
 
   var toNode = function(message){
     var $usrHTML = $('<span class="handle"></span>');
+    if (!message.username){
+      message.username = 'anonymous';
+    }
     $usrHTML.text(message.username);
     var $msgHTML = $('<span class="msgText"></span>');
     $msgHTML.text(message.text);
+    $usrHTML.addClass($usrHTML.text());
+    $msgHTML.addClass($usrHTML.text());
     $msgLineNode = $('<li>: </li>');
     $msgLineNode.prepend($usrHTML);
     $msgLineNode.append($msgHTML);
@@ -81,18 +100,43 @@ var displayMessage = function (msgs) {
     return '';
   };
 
-  for ( var i = 0 ; i < msgs.length ; i++){
+  var newestSize;
+  if (displayedMsgID.length === 0) {
+    newestSize = 100;
+  } else {
+    for (newestSize = 0; newestSize < msgs.length; newestSize++) {
+      if (msgs[newestSize].objectId === displayedMsgID[0]){
+        break;
+      }
+    }
+  }
+  for ( var i = newestSize-1 ; i >= 0 ; i--){
+    if (displayedMsgID.length === 100) {
+      displayedMsgID.pop();
+    }
+    displayedMsgID.unshift(msgs[i].objectId);
     makeRoom(msgs[i]);
     var $msg = toNode(msgs[i]);
     var room = getRoomClass(msgs[i]);
     $msg.addClass(room + ' all');
-  
     if ($msg.hasClass($('select')[0].value) && $msg.text().length < 140){
-      $('ul').append($msg);
+      if (displayedMsgID.length === 100) {
+        $('ul').children().last().remove();
+      }
+      if ($msg.children().first().text() in friends) {
+        $msg.css('font-weight', '800');
+      }
+      $('ul').prepend($msg);
     }
   }
+  $('.handle').on('click', function() {
+    // console.log($(this).text());
+    friends[$(this).text()] = true;
+    $('.' + $(this).text()).css('font-weight', '800');
+  });
 };
 var username = unescape(window.location.search.slice(10));
+if (username === '') {username = 'anonymous';}
 // getMessages(displayMessage);
 // var msg = new Message(username,'oops','hackreactor');
 // sendMessage(msg);

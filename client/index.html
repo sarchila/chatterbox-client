@@ -19,10 +19,14 @@
       <select>
         <option value='all'>All</option>
       </select>
-        Enter Chat: <input type="text" class="messageInput"/>
-        <span>
-          <button class="poster">Post Chat</button>
-        </span>
+      Enter Chat: <input type="text" class="messageInput"/>
+      <span>
+        <button class="poster">Post Chat</button>
+      </span>
+      Create New Room: <input type="text" class="roomInput"/>
+      <span>
+        <button class='createRoom'>Create New Room</button>
+      </span>
       <ul class="msgContainer"></ul>
     </div>
     <script type="text/javascript">
@@ -33,6 +37,12 @@
           getMessages(displayMessage);
         });
 
+        $('.createRoom').on('click', function(){
+          var roomInput = $('.roomInput')[0].value;
+          
+          addRoom(roomInput);
+        });
+
         $('.poster').on('click', function(){
           var chatInput = $('.messageInput')[0].value;
           if (chatInput !== ''){
@@ -40,12 +50,11 @@
             var txt = chatInput;
             var room = $('select')[0].value;
             $('.messageInput')[0].value = '';
-            var message = new Message(usr,txt,"hi', color:'red'");
+            var message = new Message(usr,txt,room);
             message.send();
             setTimeout(function() {getMessages(displayMessage); },200);
           }
         });
-
       });
     </script>
   </body>
