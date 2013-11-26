@@ -42,17 +42,26 @@ var getMessages = function(cb){
   });
 };
 
+var roomNames = {'all':true};
+
 var displayMessage = function (msgs) {
   $('ul').html('');
   for ( var i = 0 ; i < msgs.length ; i++){
-    // var rname = msgs[i][0].value;
+    var rn = msgs[i].roomname;
+    if (rn && !roomNames[rn] && rn.length < 30) {
+      roomNames[msgs[i].roomname] = true;
+      $room = $('<option></option>');
+      $room.text(msgs[i].roomname);
+      $room.val(msgs[i].roomname);
+      $('select').append($room);
+    }
     var $uname = $('<li></li>');
     var $msg = $('<li></li>');
     $uname.text(msgs[i].username);
     $msg.text(msgs[i].text);
     $msg.text($uname.text() + ': ' + $msg.text());
     $msg.addClass(msgs[i].roomname + ' all');
-    if ($msg.hasClass($('select')[0].value)){
+    if ($msg.hasClass($('select')[0].value) && $msg.text().length < 140){
       $('ul').append($msg);
     }
   }
