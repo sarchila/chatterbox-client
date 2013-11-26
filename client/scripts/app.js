@@ -14,30 +14,33 @@ Message.prototype.send = function(){
     data: JSON.stringify(this),
     contentType: 'application/json',
     success: function (data) {
-      console.log(data);
+      // console.log(data);
       console.log('chatterbox: Message sent');
     },
     error: function (data) {
-      console.log(data);
+      // console.log(data);
       // see: https://developer.mozilla.org/en-US/docs/Web/API/console.error
       console.error('chatterbox: Failed to send message');
     }
   });
 };
 
-var printToLog = function (arg) {
-  console.log(arg);
+Message.prototype.toNode = function(){
+  var $usrHTML = $('<span class="handle"></span>');
+  $usrHTML.text(this.username);
+  var $msgHTML = $('<span class="msgText"></span>');
+  $msgHTML.text(this.text);
+  $msgLineNode = $('<li> : </li>');
+  $msgLineNode.prepend($usrHTML);
+  $msgLineNode.append($msgHTML);
+  return $msgLineNode;
 };
 
 var getMessages = function(cb){
-  cb = cb || printToLog;
   $.ajax({
     type: 'GET',
     url: 'https://api.parse.com/1/classes/chatterbox?order=-createdAt',
-    success:function(data){
-      console.log(data);
-      cb(data.results);
-    },
+    success:function(data){cb(data.results);},
     error:function(){console.log("GET error");}
   });
 };

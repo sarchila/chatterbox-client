@@ -49,3 +49,7 @@ body {
   border-top-color: #1b435e;
   background: #1b435e;
 }
+ul
+{
+  list-style-type: none;
+}
