@@ -25,16 +25,16 @@ Message.prototype.send = function(){
   });
 };
 
-Message.prototype.toNode = function(){
-  var $usrHTML = $('<span class="handle"></span>');
-  $usrHTML.text(this.username);
-  var $msgHTML = $('<span class="msgText"></span>');
-  $msgHTML.text(this.text);
-  $msgLineNode = $('<li> : </li>');
-  $msgLineNode.prepend($usrHTML);
-  $msgLineNode.append($msgHTML);
-  return $msgLineNode;
-};
+// Message.prototype.toNode = function(){
+//   var $usrHTML = $('<span class="handle"></span>');
+//   $usrHTML.text(this.username);
+//   var $msgHTML = $('<span class="msgText"></span>');
+//   $msgHTML.text(this.text);
+//   $msgLineNode = $('<li>: </li>');
+//   $msgLineNode.prepend($usrHTML);
+//   $msgLineNode.append($msgHTML);
+//   return $msgLineNode;
+// };
 
 var getMessages = function(cb){
   $.ajax({
@@ -49,21 +49,44 @@ var roomNames = {'all':true};
 
 var displayMessage = function (msgs) {
   $('ul').html('');
-  for ( var i = 0 ; i < msgs.length ; i++){
-    var rn = msgs[i].roomname;
+
+  var makeRoom = function(message) {
+    var rn = message.roomname;
     if (rn && !roomNames[rn] && rn.length < 30) {
-      roomNames[msgs[i].roomname] = true;
+      roomNames[message.roomname] = true;
       $room = $('<option></option>');
-      $room.text(msgs[i].roomname);
-      $room.val(msgs[i].roomname);
+      $room.text(message.roomname);
+      $room.val(message.roomname);
       $('select').append($room);
     }
-    var $uname = $('<li></li>');
-    var $msg = $('<li></li>');
-    $uname.text(msgs[i].username);
-    $msg.text(msgs[i].text);
-    $msg.text($uname.text() + ': ' + $msg.text());
-    $msg.addClass(msgs[i].roomname + ' all');
+  };
+
+  var toNode = function(message){
+    var $usrHTML = $('<span class="handle"></span>');
+    $usrHTML.text(message.username);
+    var $msgHTML = $('<span class="msgText"></span>');
+    $msgHTML.text(message.text);
+    $msgLineNode = $('<li>: </li>');
+    $msgLineNode.prepend($usrHTML);
+    $msgLineNode.append($msgHTML);
+    return $msgLineNode;
+  };
+
+  var getRoomClass = function(message) {
+    var rn = message.roomname;
+    if (rn && rn.length < 30) {
+      var $rn = $('<li></li>').text(rn);
+    return $rn.text();
+    }
+    return '';
+  };
+
+  for ( var i = 0 ; i < msgs.length ; i++){
+    makeRoom(msgs[i]);
+    var $msg = toNode(msgs[i]);
+    var room = getRoomClass(msgs[i]);
+    $msg.addClass(room + ' all');
+  
     if ($msg.hasClass($('select')[0].value) && $msg.text().length < 140){
       $('ul').append($msg);
     }
