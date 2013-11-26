@@ -16,13 +16,38 @@
     <div id="main">
       <h1>Chat-Client</h1>
       <button class='button'>Get Chats</button>
+      <select>
+        <option value='all'>All</option>
+        <option value="hackreactor">Hack Reactor</option>
+        <option value="4chan">4chan</option>
+        <option value="awesome">Awesome</option>
+      </select>
+        Enter Chat: <input type="text" class="messageInput"/>
+        <span>
+          <button class="poster">Post Chat</button>
+        </span>
       <ul class="msgContainer"></ul>
     </div>
     <script type="text/javascript">
       $(document).ready(function(){
+
         $('.button').on('click', function(){
           getMessages(displayMessage);
         });
+
+        $('.poster').on('click', function(){
+          var chatInput = $('.messageInput')[0].value;
+          if (chatInput !== ''){
+            var usr = username;
+            var txt = chatInput;
+            var room = $('select')[0].value;
+            $('.messageInput')[0].value = '';
+            var message = new Message(usr,txt,room);
+            message.send();
+            setTimeout(function() {getMessages(displayMessage); },200);
+          }
+        });
+
       });
     </script>
   </body>
