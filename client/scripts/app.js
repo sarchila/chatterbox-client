@@ -1,40 +1,84 @@
-// new Message creates message class objects
-var Message = function(username, text, roomname){
-  this.username = username;
-  this.text = text;
-  this.roomname = roomname;
+var events = _.clone(Backbone.Events);
+
+var Message = function(){
 };
 
-Message.prototype.send = function(){
-  console.log(JSON.stringify(this));
+
+Message.prototype.send = function(uname, txt, rmname){
   $.ajax({
-    // always use this url
     url: 'https://api.parse.com/1/classes/chatterbox',
     type: 'POST',
-    data: JSON.stringify(this),
+    data: JSON.stringify({
+      username: uname,
+      text: txt,
+      roomname: rmname
+    }),
     contentType: 'application/json',
-    success: function (data) {
-      // console.log(data);
+    success: function(){
       console.log('chatterbox: Message sent');
+      events.trigger('message:send');
     },
     error: function (data) {
-      // console.log(data);
       // see: https://developer.mozilla.org/en-US/docs/Web/API/console.error
       console.error('chatterbox: Failed to send message');
     }
   });
 };
 
-// Message.prototype.toNode = function(){
-//   var $usrHTML = $('<span class="handle"></span>');
-//   $usrHTML.text(this.username);
-//   var $msgHTML = $('<span class="msgText"></span>');
-//   $msgHTML.text(this.text);
-//   $msgLineNode = $('<li>: </li>');
-//   $msgLineNode.prepend($usrHTML);
-//   $msgLineNode.append($msgHTML);
-//   return $msgLineNode;
-// };
+var ChatView = function(options){
+  this.message = options.message;
+
+  events.on('message:send', this.clearInput, this);
+  events.on('message:send', this.getAndDisplay, this);
+
+
+  var sendMsg = $.proxy(this.addMessage, this);
+  var getMsg = $.proxy(this.getAndDisplay, this);
+  var mkRm = $.proxy(this.addRoom, this);
+  $('.poster').on('click', sendMsg);
+
+   $('.button').on('click', getMsg);
+
+   $('.createRoom').on('click', mkRm);
+
+};
+
+ChatView.prototype.addMessage = function(){
+
+  var chatInput = $('.messageInput').val();
+  if (chatInput !== ''){
+    this.message.send(username, chatInput, $('select').val());
+  }
+};
+
+ChatView.prototype.clearInput = function() {
+  $('.messageInput').val('');
+};
+
+ChatView.prototype.getAndDisplay = function(){
+  getMessages(displayMessage);
+};
+
+ChatView.prototype.addRoom = function() {
+  addRoom($('.roomInput').val());
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 var getMessages = function(cb){
   $.ajax({
@@ -134,7 +178,8 @@ var displayMessage = function (msgs) {
     friends[$(this).text()] = true;
     $('.' + $(this).text()).css('font-weight', '800');
   });
-};
+}
+;
 var username = unescape(window.location.search.slice(10));
 if (username === '') {username = 'anonymous';}
 // getMessages(displayMessage);

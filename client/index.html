@@ -8,6 +8,7 @@
     <!-- external javascript -->
     <script src="bower_components/jquery/jquery.min.js"></script>
     <script src="bower_components/underscore/underscore-min.js"></script>
+    <script src="bower_components/backbone/backbone-min.js"></script>
     <!-- internal javascript -->
     <script src="scripts/config.js"></script>
     <script src="scripts/app.js"></script>
@@ -31,30 +32,8 @@
     </div>
     <script type="text/javascript">
       $(document).ready(function(){
-
-
-        $('.button').on('click', function(){
-          getMessages(displayMessage);
-        });
-
-        $('.createRoom').on('click', function(){
-          var roomInput = $('.roomInput')[0].value;
-          
-          addRoom(roomInput);
-        });
-
-        $('.poster').on('click', function(){
-          var chatInput = $('.messageInput')[0].value;
-          if (chatInput !== ''){
-            var usr = username;
-            var txt = chatInput;
-            var room = $('select')[0].value;
-            $('.messageInput')[0].value = '';
-            var message = new Message(usr,txt,room);
-            message.send();
-            setTimeout(function() {getMessages(displayMessage); },200);
-          }
-        });
+        var message = new Message();
+        new ChatView({message: message});
       });
     </script>
   </body>
