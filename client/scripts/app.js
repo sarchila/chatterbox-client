@@ -29,22 +29,18 @@ var ChatView = function(options){
   this.message = options.message;
 
   events.on('message:send', this.clearInput, this);
-  events.on('message:send', this.getAndDisplay, this);
-
 
   var sendMsg = $.proxy(this.addMessage, this);
-  var getMsg = $.proxy(this.getAndDisplay, this);
+  var getMsg = MessageView.prototype.getAndDisplay;
   var mkRm = $.proxy(this.addRoom, this);
+
   $('.poster').on('click', sendMsg);
-
-   $('.button').on('click', getMsg);
-
-   $('.createRoom').on('click', mkRm);
+  $('.button').on('click', getMsg);
+  $('.createRoom').on('click', mkRm);
 
 };
 
 ChatView.prototype.addMessage = function(){
-
   var chatInput = $('.messageInput').val();
   if (chatInput !== ''){
     this.message.send(username, chatInput, $('select').val());
@@ -55,17 +51,20 @@ ChatView.prototype.clearInput = function() {
   $('.messageInput').val('');
 };
 
-ChatView.prototype.getAndDisplay = function(){
-  getMessages(displayMessage);
-};
+
 
 ChatView.prototype.addRoom = function() {
   addRoom($('.roomInput').val());
 };
 
 
+var MessageView = function (){
+  events.on('message:send', this.getAndDisplay, this);
+};
 
-
+MessageView.prototype.getAndDisplay = function(){
+  getMessages(displayMessage);
+};
 
 
 
